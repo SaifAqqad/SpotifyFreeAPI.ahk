@@ -1,0 +1,3 @@
+[submodule "src/lib/Edge"]
+	path = src/lib/Edge
+	url = https://github.com/SaifAqqad/Edge.ahk.git
