@@ -11,8 +11,9 @@ This library uses a headless edge browser to access the token through discord, O
 
 1. You need to clone this repo with **ALL** of its submodules
     ```powershell
-    git clone --recurse-submodules https://github.com/SaifAqqad/SpotifyFreeAPI.git
+    git clone --recurse-submodules https://github.com/SaifAqqad/SpotifyFreeAPI.ahk.git
     ```
+    or just use the [single-file release](https://github.com/SaifAqqad/SpotifyFreeAPI.ahk/releases/latest)
 
 2. Include the SpotifyFreeAPI.ahk file in your script
     
