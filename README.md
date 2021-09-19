@@ -7,7 +7,7 @@ This library uses a headless edge browser to access the token through discord, O
 
 ### Usage
 
-#### Note: I highly recommend that you don't use your main  discord and spotify accounts with this, as it obviously compromises their security.
+#### Note: I highly recommend that you don't use your main discord and spotify accounts with this, as it obviously compromises their security.
 
 1. You need to clone this repo with **ALL** of its submodules
     ```powershell
@@ -26,7 +26,7 @@ This library uses a headless edge browser to access the token through discord, O
     ```
 3. Create a new instance of the `SpotifyAPI` class
     ```ahk
-    global spotify := new SpotifyAPI('your_spotify_username')
+    global spotify := new SpotifyAPI("your_spotify_username")
     ; you can omit the username but you'll need to play
     ; something on spotify for the library to retrieve the token
     global spotify := new SpotifyAPI()
