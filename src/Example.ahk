@@ -5,7 +5,6 @@
 #MaxThreadsBuffer, On 
 
 global spotify := new SpotifyAPI()
-     , current_vol:= spotify.GetCurrentPlaybackInfo().device.volume_percent
 
 <^Up::spotify.SetVolume(10,1)
 
