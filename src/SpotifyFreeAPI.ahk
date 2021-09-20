@@ -15,7 +15,7 @@ class SpotifyAPI{
         }
         this.edgeInst := new Edge(A_ScriptDir "\" this.EdgeProfile,,"--headless --disable-gpu https://discord.com/app")
         this.pageInst := this.edgeInst.GetPageByURL("https://discord.com")
-        Sleep, 3000
+        this.pageInst.WaitForLoad()
         this.updateToken()
         this.ws:= new SpotifyWebSocket(this.token)
         OnExit(ObjBindMethod(this,"onExit"))
@@ -79,23 +79,21 @@ class SpotifyAPI{
     }
 
     isDiscordAuthed(){
-        edg := new Edge(A_ScriptDir "\" this.EdgeProfile,,"--headless --disable-gpu https://discord.com/app")
+        edg := new Edge(A_ScriptDir "\" this.EdgeProfile,,"--headless --disable-gpu https://discord.com/login")
         page := edg.GetPageByURL("https://discord.com")
         page.WaitForLoad()
-        sleep 1000
+        sleep 200
         url:= page.Evaluate("window.location.pathname").value
-        page.Call("Browser.close")
-        page.Disconnect()
         edg.Kill()
-        return InStr(url, "login")? 0 : 1
+        page.Disconnect()
+        return InStr(url,"login")? 0 : 1
     }
 
     discordLogin(){
         MsgBox, 65, SpotifyNonPremiumAPI, You need to sign in to your discord account
         IfMsgBox, Cancel
-            return 0
+            Throw, Exception("Could not sign in to discord")
         Try{
-            MsgBox, 64, SpotifyNonPremiumAPI, Make sure to close the browser window after signing in
             edg := new Edge(A_ScriptDir "\" this.EdgeProfile,,"--app=https://discord.com/login")
             page := edg.GetPageByURL("https://discord.com")
             page.WaitForLoad()
@@ -103,11 +101,10 @@ class SpotifyAPI{
             while(InStr(page.Evaluate("window.location.pathname").value, "login")){
             }
             page.WaitForLoad()
-            sleep 500
-            WinWaitClose, "Discord ahk_exe msedge.exe"
-            page.Call("Browser.close")
-            Try page.Disconnect()
+            sleep 2000
+            Try page.Call("Browser.close")
             edg.Kill()
+            page.Disconnect()
         }catch err {
             MsgBox,16, SpotifyNonPremiumAPI, % "An error occured: " . err.message
             return 0
@@ -147,9 +144,8 @@ class SpotifyAPI{
     }
 
     onExit(){
-        this.pageInst.Call("Browser.close")
-        this.pageInst.Disconnect()
         this.edgeInst.Kill()
+        this.pageInst.Disconnect()
     }
 
     class SpotifyWebSocket{ ; https://github.com/G33kDude/WebSocket.ahk
@@ -217,4 +213,3 @@ class SpotifyAPI{
         }
     }
 }
-
