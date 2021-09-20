@@ -66,6 +66,10 @@ class SpotifyAPI{
         return this.CallAPI("GET", "me/player")
     }
 
+    GetCurrentTrackInfo(){
+        return this.CallAPI("GET", "me/player/currently-playing?market=from_token")
+    }
+
     NextTrack(){
         return this.CallAPI("POST", "me/player/next")
     }
