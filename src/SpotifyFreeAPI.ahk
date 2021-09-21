@@ -5,16 +5,17 @@ class SpotifyAPI{
     , js_getToken:= "findByUniqueProperties(['SpotifyAPI']).getAccessToken('{}');"
     
     __New(SpotifyUserName:=""){
-        this.EdgeProfile:= "spotfyEdgeProfile"
+        this.EdgeProfile:= "spotifyEdgeProfile"
         this.spotifyUserName:= SpotifyUserName
-        FileCreateDir, % this.EdgeProfile
+        FileCreateDir, % A_ScriptDir "\" this.EdgeProfile
         authCheck:
+        sleep 200
         if(!this.isDiscordAuthed()){
             this.discordLogin()
             Goto, authCheck
         }
-        this.edgeInst := new Edge(A_ScriptDir "\" this.EdgeProfile,,"--headless --disable-gpu https://discord.com/app")
-        this.pageInst := this.edgeInst.GetPageByURL("https://discord.com")
+        this.edgeInst := new Edge(A_ScriptDir "\" this.EdgeProfile,"https://discord.com/login","--no-first-run --headless --disable-gpu")
+        this.pageInst := this.edgeInst.GetPageByURL("discord.com", "contains")
         this.pageInst.WaitForLoad()
         this.updateToken()
         this.ws:= new SpotifyWebSocket(this.token)
@@ -55,7 +56,8 @@ class SpotifyAPI{
         if(IncDec)
             volume:= this.GetVolume() + volume
         volume:= Min(Max(volume, 0), 100) ;to make sure it stays between 0 and 100
-        return this.CallAPI("PUT", "me/player/volume?volume_percent=" . volume)
+        response:= this.CallAPI("PUT", "me/player/volume?volume_percent=" . volume)
+        return response=""? volume : response
     }
 
     GetVolume(){
@@ -79,8 +81,8 @@ class SpotifyAPI{
     }
 
     isDiscordAuthed(){
-        edg := new Edge(A_ScriptDir "\" this.EdgeProfile,,"--headless --disable-gpu https://discord.com/login")
-        page := edg.GetPageByURL("https://discord.com")
+        edg := new Edge(A_ScriptDir "\" this.EdgeProfile,"https://discord.com/login","--no-first-run --headless --disable-gpu")
+        page := edg.GetPageByURL("discord.com", "contains")
         page.WaitForLoad()
         sleep 200
         url:= page.Evaluate("window.location.pathname").value
@@ -94,14 +96,14 @@ class SpotifyAPI{
         IfMsgBox, Cancel
             Throw, Exception("Could not sign in to discord")
         Try{
-            edg := new Edge(A_ScriptDir "\" this.EdgeProfile,,"--app=https://discord.com/login")
-            page := edg.GetPageByURL("https://discord.com")
+            edg := new Edge(A_ScriptDir "\" this.EdgeProfile,"","--no-first-run --new-window --windows-size=500,500 --app=https://discord.com/login")
+            page := edg.GetPageByURL("discord.com", "contains")
             page.WaitForLoad()
             sleep 2000
             while(InStr(page.Evaluate("window.location.pathname").value, "login")){
+                sleep 1000
             }
             page.WaitForLoad()
-            sleep 2000
             Try page.Call("Browser.close")
             edg.Kill()
             page.Disconnect()
