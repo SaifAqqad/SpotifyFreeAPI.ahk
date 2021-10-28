@@ -1,8 +1,8 @@
 #Include, %A_LineFile%\..\lib\Edge\Edge.ahk
 class SpotifyAPI{
-    static js_find_declr:= "const req='function'==typeof webpackJsonp?webpackJsonp([],{__extra_id__:(e,n,t)=>n.default=t},['__extra_id__']).default:webpackJsonp.push([[],{__extra_id__:(e,n,t)=>e.exports=t},[['__extra_id__']]]);delete req.m.__extra_id__,delete req.c.__extra_id__;const find=(e,n={})=>{const{cacheOnly:t=!0}=n;for(let n in req.c)if(req.c.hasOwnProperty(n)){let t=req.c[n].exports;if(t&&t.__esModule&&t.default&&e(t.default))return t.default;if(t&&e(t))return t}if(t)return console.warn('Cannot find loaded module in cache'),null;console.warn('Cannot find loaded module in cache. Loading all modules may have unexpected side effects');for(let n=0;n<req.m.length;++n)try{let t=req(n);if(t&&t.__esModule&&t.default&&e(t.default))return t.default;if(t&&e(t))return t}catch(e){}return console.warn('Cannot find module'),null},findByUniqueProperties=(e,n)=>find(n=>e.every(e=>void 0!==n[e]),n);"
-    , js_getUserId:= "findByUniqueProperties(['getActiveSocketAndDevice']).getActiveSocketAndDevice()?.socket.accountId;"
-    , js_getToken:= "findByUniqueProperties(['SpotifyAPI']).getAccessToken('{}');"
+    static js_find_declr:= "let request=e=>{if(e&&this._cache)return this._cache;let t;return'webpackJsonp'in window?t=window.webpackJsonp.push([[],{[this.id]:(e,t,i)=>e.exports=i},[[this.id]]]):'webpackChunkdiscord_app'in window&&window.webpackChunkdiscord_app.push([[this.id],{},e=>t=e]),this._cache=t},FindModule=e=>{const i=request(e),s=[];for(let t in i.c){var n=i.c[t].exports;if(n&&n.__esModule&&n.default&&n.default[e])return n.default;if(n&&n[e])return n}return t?s:s.shift()};"
+    , js_getUserId:= "FindModule('getActiveSocketAndDevice').getActiveSocketAndDevice()?.socket.accountId;"
+    , js_getToken:= "FindModule('SpotifyAPI').getAccessToken('{}');"
     
     __New(SpotifyUserName:=""){
         this.EdgeProfile:= "spotifyEdgeProfile"
@@ -116,7 +116,7 @@ class SpotifyAPI{
     }
 
     updateToken(){
-        Try this.pageInst.Evaluate("findByUniqueProperties")
+        Try this.pageInst.Evaluate("FindModule")
         catch err { ;function not defined
             this.pageInst.Evaluate(this.js_find_declr)
         }
