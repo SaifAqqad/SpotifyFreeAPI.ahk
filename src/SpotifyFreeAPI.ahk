@@ -81,28 +81,41 @@ class SpotifyAPI{
     }
 
     isDiscordAuthed(){
-        edg := new Edge(A_ScriptDir "\" this.EdgeProfile,"https://discord.com/login","--no-first-run --headless --disable-gpu")
-        page := edg.GetPageByURL("discord.com", "contains")
-        page.WaitForLoad()
-        sleep 200
-        url:= page.Evaluate("window.location.pathname").value
+        timeTicked:= A_TickCount
+        this.authState:= -1
+        edg := new Edge(A_ScriptDir "\" this.EdgeProfile,"https://discord.com/login","--no-first-run --mute-audio --headless --disable-gpu")
+        page := edg.GetPageByURL("discord.com", "contains",, ObjBindMethod(this, "onPageMsg"))
+        page.Call("Console.enable")
+        while (this.authState == -1 && A_TickCount - timeTicked < 10000)
+            sleep 500
+        if(this.authState == -1)
+            throw, Exception("Failed to authenticate")
         edg.Kill()
         page.Disconnect()
-        return InStr(url,"login")? 0 : 1
+        return this.authState
+    }
+
+    onPageMsg(event){
+        if(event.Method == "Console.messageAdded"){
+            if(InStr(event.params.message.text,"handshake complete")) ; Transitioning to /app
+                this.authState:= 0
+            else if (InStr(event.params.message.text,"Transitioning to /app"))
+                this.authState:= 1
+        }
     }
 
     discordLogin(){
+        this.authState:=0
         MsgBox, 65, SpotifyNonPremiumAPI, You need to sign in to your discord account
         IfMsgBox, Cancel
             Throw, Exception("Could not sign in to discord")
         Try{
             edg := new Edge(A_ScriptDir "\" this.EdgeProfile,"","--no-first-run --new-window --windows-size=500,500 --app=https://discord.com/login")
-            page := edg.GetPageByURL("discord.com", "contains")
+            page := edg.GetPageByURL("discord.com", "contains",, ObjBindMethod(this, "onPageMsg"))
+            page.Call("Console.enable")
             page.WaitForLoad()
-            sleep 2000
-            while(InStr(page.Evaluate("window.location.pathname").value, "login")){
-                sleep 1000
-            }
+            while (this.authState != 1)
+                sleep 500
             page.WaitForLoad()
             Try page.Call("Browser.close")
             edg.Kill()
